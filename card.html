@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字書</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 30px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .book {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f0f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 75%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        #prev-page, #next-page {
+            font-size: 36px;
+            color: #666;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #prev-page:hover, #next-page:hover {
+            background-color: #ddd;
+            color: #000;
+        }
+
+        #data-table {
+            margin: 0 20px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            color: #333;
+            font-size: 20px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .english {
+            font-size: 28px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .chinese {
+            font-size: 24px;
+        }
+
+        .form {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .page-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .play-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #007BFF;
+            outline: none;
+        }
+
+        .play-button:hover {
+            color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            .book {
+                width: 90%;
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            #prev-page, #next-page {
+                margin: 10px 0;
+            }
+
+            #data-table {
+                margin: 0;
+            }
+
+            table {
+                font-size: 16px;
+            }
+
+            .english {
+                font-size: 24px;
+            }
+
+            .chinese {
+                font-size: 20px;
+            }
+
+            .form {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>單字書</h1>
+<div class="container">
+    <div class="book">
+        <div id="prev-page">&lt;</div>
+        <table id="data-table">
+            <thead>
+            <tr>
+                <th colspan="3">單字</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Table content will be added dynamically with JavaScript -->
+            </tbody>
+        </table>
+        <div id="next-page">&gt;</div>
+    </div>
+    <div class="page-indicator" id="page-indicator"></div>
+</div>
+
+<script>
+    const apiKey = 'AIzaSyCpDxyaGTMVROuWKwv3V9v9Gw8-MW32zko'; // 替換為你的API金鑰
+    const sheetId = '195PQskA54HlhF5bUrh4IQPSgW4nc6heXpGJKdsJ79A0';
+    const range = 'Sheet1'; // 根據你的需求調整範圍
+
+    const itemsPerPage = 1; // Number of items to display per page
+    let currentPage = 1;
+    let data = [];
+
+    const fetchData = () => {
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+            .then(response => response.json())
+            .then(responseData => {
+                const [header, ...rows] = responseData.values;
+                data = rows.map(row => {
+                    const [english, chinese, form] = row;
+                    return { english, chinese, form };
+                });
+                renderPage();
+            })
+            .catch(error => console.error('Error:', error));
+    };
+
+    const renderPage = () => {
+        const tableBody = document.querySelector('#data-table tbody');
+        const pageIndicator = document.getElementById('page-indicator');
+        tableBody.innerHTML = '';
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        for (let i = startIndex; i < endIndex && i < data.length; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="3" class="english">${data[i].english}
+                    <button class="play-button" onclick="playSound('${data[i].english}')">🔊</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+
+            const row2 = document.createElement('tr');
+            row2.innerHTML = `
+                <td colspan="3" class="chinese">${data[i].chinese}</td>
+            `;
+            tableBody.appendChild(row2);
+
+            const row3 = document.createElement('tr');
+            row3.innerHTML = `
+                <td colspan="3" class="form">${data[i].form}</td>
+            `;
+            tableBody.appendChild(row3);
+        }
+
+        pageIndicator.textContent = `Page ${currentPage} of ${Math.ceil(data.length / itemsPerPage)}`;
+    };
+
+    const goToNextPage = () => {
+        if (currentPage < Math.ceil(data.length / itemsPerPage)) {
+            currentPage++;
+            renderPage();
+        }
+    };
+
+    const goToPrevPage = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage();
+        }
+    };
+
+    const playSound = (text) => {
+        const soundApiUrl = `https://api.ovooa.cc/api/Text-to-speech/?msg=${encodeURIComponent(text)}&h=mp3`;
+        fetch(soundApiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === '0') {
+                    const audio = new Audio(data.link);
+                    audio.play();
+                } else {
+                    console.error('Error:', data);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    };
+
+    document.getElementById('next-page').addEventListener('click', goToNextPage);
+    document.getElementById('prev-page').addEventListener('click', goToPrevPage);
+
+    fetchData();
+</script>
+</body>
+</html>

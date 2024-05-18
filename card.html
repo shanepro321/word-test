@@ -245,16 +245,23 @@
     const playSound = (text) => {
         const soundApiUrl = `https://api.ovooa.cc/api/Text-to-speech/?msg=${encodeURIComponent(text)}&h=mp3`;
         fetch(soundApiUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.code === '0') {
                     const audio = new Audio(data.link);
-                    audio.play();
+                    audio.play().catch(error => {
+                        console.error('Error playing audio:', error);
+                    });
                 } else {
                     console.error('Error:', data);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Fetch error:', error));
     };
 
     document.getElementById('next-page').addEventListener('click', goToNextPage);

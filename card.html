@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>單字書</title>
     <style>
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
@@ -118,6 +119,7 @@
         .play-button:hover {
             color: #0056b3;
         }
+
 
         @media (max-width: 600px) {
             .book {
@@ -243,25 +245,9 @@
     };
 
     const playSound = (text) => {
-        const soundApiUrl = `https://api.ovooa.cc/api/Text-to-speech/?msg=${encodeURIComponent(text)}&h=mp3`;
-        fetch(soundApiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.code === '0') {
-                    const audio = new Audio(data.link);
-                    audio.play().catch(error => {
-                        console.error('Error playing audio:', error);
-                    });
-                } else {
-                    console.error('Error:', data);
-                }
-            })
-            .catch(error => console.error('Fetch error:', error));
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
     };
 
     document.getElementById('next-page').addEventListener('click', goToNextPage);

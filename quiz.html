@@ -11,8 +11,11 @@
 <div id="navigation">
     <ul>
         <li><a href="index.html">Home</a></li>
+
         <li><a href="quiz.html">Quiz</a></li>
+
         <li><a href="setting.html">Settings</a></li>
+
         <li><a href="card.html">單字書</a></li>
     </ul>
 </div>
@@ -74,7 +77,7 @@
 
         if (currentQuestionIndex < wordData.length) {
             const currentWord = wordData[currentQuestionIndex];
-            questionElement.innerText = `What is the definition of "${currentWord.english}, ${currentWord.Part_of_Speech}"?\n${currentWord.Sentence}`;
+            questionElement.innerText = `單字：${currentWord.english}, ${currentWord.Part_of_Speech}\n 句子：${currentWord.Sentence}`;
 
             const options = [currentWord.Chinese];
             while (options.length < 4) {

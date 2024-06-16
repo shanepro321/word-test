@@ -5,112 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Learning App</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* General styling for the body */
-        body {
-            font-family: 'Helvetica', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
 
-        /* Styling for the navigation bar */
-        #navigation ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: space-around;
-            background-color: #333;
-            flex-wrap: wrap;
-        }
-
-        #navigation li {
-            display: inline;
-        }
-
-        #navigation a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        #navigation a:hover {
-            background-color: #111;
-        }
-
-        /* Styling for the content area */
-        #content {
-            padding: 20px;
-        }
-
-        /* Flexbox for vertical and horizontal stacking */
-        .vstack, .hstack {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .hstack {
-            flex-direction: row;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Styling for the interactive boxes */
-        .large-box {
-            background-color: #007BFF;
-            color: white;
-            padding: 20px;
-            margin: 10px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            flex: 1;
-            max-width: 200px;
-            box-sizing: border-box;
-        }
-
-        .large-box:hover {
-            background-color: #0056b3;
-        }
-
-        /* Responsive styling for screens 600px or smaller */
-        @media (max-width: 600px) {
-            #navigation ul {
-                flex-direction: column;
-            }
-
-            #navigation a {
-                padding: 10px;
-            }
-
-            .hstack {
-                flex-direction: column;
-            }
-
-            .large-box {
-                width: 100%;
-                max-width: none;
-                margin: 10px 0;
-            }
-
-            #content {
-                padding: 10px;
-            }
-        }
-    </style>
 </head>
 <body>
+
 <div id="navigation">
     <ul>
-        <li><a href="/index.html">Home</a></li>
-        <li><a href="/quiz.html">Quiz</a></li>
-        <li><a href="/setting.html">Settings</a></li>
-        <li><a href="/card.html">單字書</a></li>
+        <li><a href="index.html">Home</a></li> <!-- Update this line -->
+        <li><a href="quiz.html">Quiz</a></li>
+        <li><a href="setting.html">Settings</a></li>
+        <li><a href="card.html">單字書</a></li> <!-- This is your card.html link -->
     </ul>
 </div>
 
@@ -119,36 +23,37 @@
         <h1>English Learning App</h1>
         <div class="vstack">
             <div class="hstack">
-                <div class="large-box" onclick="navigateToQuiz()">開始測驗</div>
-                <div class="large-box">單字拼寫</div>
+                <a href="quiz.html" class="large-box">開始測驗</a>
+                <a href="card.html" class="large-box">單字書</a>
             </div>
             <div class="hstack">
-                <div class="large-box">新增單字</div>
-                <div class="large-box">題庫管理</div>
+                <a href="#" class="large-box">單字拼寫</a>
+                <a href="#" class="large-box">題庫管理</a>
+
             </div>
             <div class="hstack">
-                <div class="large-box">單字書</div>
-                <div class="large-box">待更新</div>
+                <a href="#" class="large-box">新增單字</a>
+                <a href="#" class="large-box">未新增</a>
             </div>
         </div>
     </div>
+</div>
+
 
     <div id="quiz" class="page" style="display: none;">
+        <h1>Quiz</h1>
+        <!-- Quiz content here -->
     </div>
 
     <div id="settings" class="page" style="display: none;">
+        <h1>Settings</h1>
+        <!-- Settings content here -->
+    </div>
+
+    <div id="card" class="page" style="display: none;">
+        <h1>單字書</h1>
+        <!-- Card content here -->
     </div>
 </div>
-
-<script src="scripts.js"></script>
-<script>
-    // JavaScript functions to navigate between pages
-    function navigateToQuiz() {
-        document.getElementById('home').style.display = 'none';
-        document.getElementById('quiz').style.display = 'block';
-    }
-
-    // Add additional JavaScript as needed
-</script>
 </body>
 </html>

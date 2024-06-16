@@ -4,162 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>單字書</title>
-    <style>
-        body {
-            font-family: 'Helvetica', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin: 30px 0;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .book {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f0f5ff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
-            box-sizing: border-box;
-        }
-
-        #prev-page, #next-page {
-            font-size: 36px;
-            color: #666;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 50%;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        #prev-page:hover, #next-page:hover {
-            background-color: #ddd;
-            color: #000;
-        }
-
-        #data-table {
-            margin: 0 20px;
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 5px;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        th, td {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            color: #333;
-            font-size: 20px;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-
-        .english {
-            font-size: 28px;
-            font-weight: bold;
-            position: relative;
-        }
-
-        .chinese {
-            font-size: 24px;
-        }
-
-        .form {
-            font-size: 20px;
-            color: #666;
-        }
-
-        .page-indicator {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 18px;
-            color: #666;
-        }
-
-        .play-button {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #007BFF;
-            outline: none;
-        }
-
-        .play-button:hover {
-            color: #0056b3;
-        }
-
-        @media (max-width: 600px) {
-            .book {
-                flex-direction: column;
-                padding: 10px;
-                width: 90%;
-            }
-
-            #prev-page, #next-page {
-                margin: 10px 0;
-                font-size: 30px;
-            }
-
-            #data-table {
-                margin: 0;
-            }
-
-            table {
-                font-size: 16px;
-            }
-
-            .english {
-                font-size: 24px;
-            }
-
-            .chinese {
-                font-size: 20px;
-            }
-
-            .form {
-                font-size: 18px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="navigation">
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="quiz.html">Quiz</a></li>
+        <li><a href="setting.html">Settings</a></li>
+        <li><a href="card.html">單字書</a></li>
+    </ul>
+</div>
 <h1>單字書</h1>
 <div class="container">
+    <div class="selection">
+        <label for="lesson-select">選擇課程:</label>
+        <select id="lesson-select">
+            <option value="Lesson7">Lesson 7</option>
+            <option value="Lesson8">Lesson 8</option>
+            <option value="Lesson9">Lesson 9</option>
+            <option value="Phrases">Phrases</option>
+        </select>
+    </div>
     <div class="book">
-        <div id="prev-page">&lt;</div>
+        <div id="prev-page" class="nav-button">&lt;</div>
         <table id="data-table">
             <thead>
             <tr>
@@ -170,20 +38,18 @@
             <!-- Table content will be added dynamically with JavaScript -->
             </tbody>
         </table>
-        <div id="next-page">&gt;</div>
+        <div id="next-page" class="nav-button">&gt;</div>
     </div>
     <div class="page-indicator" id="page-indicator"></div>
 </div>
 
 <script>
-    const apiKey = 'AIzaSyCpDxyaGTMVROuWKwv3V9v9Gw8-MW32zko'; // 替換為你的API金鑰
-    const sheetId = '195PQskA54HlhF5bUrh4IQPSgW4nc6heXpGJKdsJ79A0';
-
-    const range = 'Sheet1'; // 根據你的需求調整範圍
-
-    const itemsPerPage = 1; // Number of items to display per page
+    const apiKey = 'AIzaSyAyiSe_jO55Ex4uqlHA-gusz3Zyi0IZeV8';
+    const sheetId = '1G_baks1_pgSjnmvcHS-wEGi6hrZ7lXyoU0uQkuRW1Sg';
+    const itemsPerPage = 1;
     let currentPage = 1;
     let data = [];
+    let range = 'Lesson7';
 
     const fetchData = () => {
         fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
@@ -194,6 +60,7 @@
                     const [english, chinese, form] = row;
                     return { english, chinese, form };
                 });
+                currentPage = 1;
                 renderPage();
             })
             .catch(error => console.error('Error:', error));
@@ -254,6 +121,11 @@
 
     document.getElementById('next-page').addEventListener('click', goToNextPage);
     document.getElementById('prev-page').addEventListener('click', goToPrevPage);
+
+    document.getElementById('lesson-select').addEventListener('change', (event) => {
+        range = event.target.value;
+        fetchData();
+    });
 
     fetchData();
 </script>

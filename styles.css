@@ -275,4 +275,17 @@ th {
   .form {
     font-size: 18px;
   }
+
+  .vocabulary-container {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .play-button {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+  }
 }

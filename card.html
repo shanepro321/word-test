@@ -57,8 +57,8 @@
             .then(responseData => {
                 const [header, ...rows] = responseData.values;
                 data = rows.map(row => {
-                    const [english, chinese, form] = row;
-                    return { english, chinese, form };
+                    const [english, Part_of_Speech, Chinese, Sentence] = row;
+                    return { english, Part_of_Speech, Chinese, Sentence };
                 });
                 currentPage = 1;
                 renderPage();
@@ -77,23 +77,32 @@
         for (let i = startIndex; i < endIndex && i < data.length; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td colspan="3" class="english">${data[i].english}
-                    <button class="play-button" onclick="playSound('${data[i].english}')">🔊</button>
+                <td colspan="3" class="english">
+                    <div class="vocabulary-container">
+                        ${data[i].english}
+                        <button class="play-button" onclick="playSound('${data[i].english}')">🔊</button>
+                    </div>
                 </td>
             `;
             tableBody.appendChild(row);
 
             const row2 = document.createElement('tr');
             row2.innerHTML = `
-                <td colspan="3" class="chinese">${data[i].chinese}</td>
+                <td colspan="3" class="Part_of_Speech">${data[i].Part_of_Speech}</td>
             `;
             tableBody.appendChild(row2);
 
             const row3 = document.createElement('tr');
             row3.innerHTML = `
-                <td colspan="3" class="form">${data[i].form}</td>
+                <td colspan="3" class="Chinese">${data[i].Chinese}</td>
             `;
             tableBody.appendChild(row3);
+
+            const row4 = document.createElement('tr');
+            row4.innerHTML = `
+                <td colspan="3" class="Sentence">${data[i].Sentence}</td>
+            `;
+            tableBody.appendChild(row4);
         }
 
         pageIndicator.textContent = `Page ${currentPage} of ${Math.ceil(data.length / itemsPerPage)}`;
@@ -129,5 +138,6 @@
 
     fetchData();
 </script>
+
 </body>
 </html>

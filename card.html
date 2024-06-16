@@ -138,6 +138,11 @@
     });
 
     fetchData();
+
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+        var nav = document.querySelector('#navigation ul');
+        nav.classList.toggle('show');
+    });
 </script>
 
 </body>

@@ -28,7 +28,6 @@
         <option value="Phrases">Phrases</option>
     </select>
     <button id="start-quiz">Start Quiz</button>
-
 </div>
 
 <div class="container">
@@ -49,17 +48,13 @@
 </div>
 
 <script>
-    // Google Sheets API configuration
-    const apiKey = 'AIzaSyBVU8ZySLCKEQ_YRTtrpvQz5yqrtwFkt_s';
+    const apiKey = 'AIzaSyCTcl56ng-WZL9455Hq__JoW4OztjTmsmA';
     const sheetId = '1G_baks1_pgSjnmvcHS-wEGi6hrZ7lXyoU0uQkuRW1Sg';
-
-    // Quiz data and state variables
     let wordData = [];
     let currentQuestionIndex = 0;
     let score = 0;
     let mistakes = [];
 
-    // Fetch data from Google Sheets
     const fetchData = (range) => {
         fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
             .then(response => response.json())
@@ -74,7 +69,6 @@
             .catch(error => console.error('Error:', error));
     };
 
-    // Start the quiz
     const startQuiz = () => {
         currentQuestionIndex = 0;
         score = 0;
@@ -87,7 +81,6 @@
         showQuestion();
     };
 
-    // Show the current question and options
     const showQuestion = () => {
         const questionElement = document.getElementById('question');
         const optionsElement = document.getElementById('options');
@@ -95,8 +88,74 @@
 
         if (currentQuestionIndex < wordData.length) {
             const currentWord = wordData[currentQuestionIndex];
-            questionElement.innerText = `單字：${currentWord.english}, ${currentWord.Part_of_Speech}\n句子：${currentWord.Sentence}`;
+            questionElement.innerText = `單字：${currentWord.english}\n 可能有重複項目 請見諒！\nThere may be duplicate items. Please forgive!`;
 
             const options = [currentWord.Chinese];
             while (options.length < 4) {
-                const randomIndex = Math.floor(Math.random() * word
+                const randomIndex = Math.floor(Math.random() * wordData.length);
+                const randomWord = wordData[randomIndex].Chinese;
+                if (!options.includes(randomWord)) {
+                    options.push(randomWord);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.addEventListener('click', () => handleAnswer(option));
+                optionsElement.appendChild(button);
+            });
+        } else {
+            endQuiz();
+        }
+    };
+
+    const handleAnswer = (selectedOption) => {
+        const currentWord = wordData[currentQuestionIndex];
+        if (selectedOption === currentWord.Chinese) {
+            score++;
+        } else {
+            mistakes.push({ word: currentWord.english, correctAnswer: currentWord.Chinese, selectedAnswer: selectedOption });
+        }
+        currentQuestionIndex++;
+        document.getElementById('score').innerText = `Score: ${score}`;
+        showQuestion();
+    };
+
+    const endQuiz = () => {
+        document.getElementById('question').classList.add('hidden');
+        document.getElementById('options').classList.add('hidden');
+        document.getElementById('final-score').innerText = `Final Score: ${score} out of ${wordData.length}`;
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('review-button').addEventListener('click', showReview);
+    };
+
+    const showReview = () => {
+        const reviewElement = document.getElementById('review');
+        const mistakesList = document.getElementById('mistakes-list');
+        mistakesList.innerHTML = '';
+
+        mistakes.forEach(mistake => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `${mistake.word}, Correct Answer: ${mistake.correctAnswer}, Your Answer: ${mistake.selectedAnswer}`;
+            mistakesList.appendChild(listItem);
+        });
+
+        reviewElement.classList.remove('hidden');
+    };
+
+    document.getElementById('start-quiz').addEventListener('click', () => {
+        const lessonSelect = document.getElementById('lesson-select');
+        const selectedLesson = lessonSelect.value;
+        fetchData(selectedLesson);
+    });
+
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+        const nav = document.querySelector('#navigation ul');
+        nav.classList.toggle('show');
+    });
+</script>
+</body>
+</html>

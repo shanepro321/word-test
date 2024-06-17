@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="navigation">
+    <button id="menu-toggle">Menu</button>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="EPC.html">Quiz EPC</a></li>
+        <li><a href="CPE.html">Quiz CPE</a></li>
+        <li><a href="Fill-in.html">Word Fill-in</a></li>
+        <li><a href="setting.html">Settings</a></li>
+        <li><a href="card.html">Word Card</a></li>
+    </ul>
+</div>
+
+<div class="selection">
+    <label for="lesson-select">選擇課程:</label>
+    <select id="lesson-select">
+        <option value="Lesson7">Lesson 7</option>
+        <option value="Lesson8">Lesson 8</option>
+        <option value="Lesson9">Lesson 9</option>
+        <option value="Phrases">Phrases</option>
+    </select>
+    <button id="start-quiz">Start Quiz</button>
+
+</div>
+
+<div class="container">
+    <h1>Quiz</h1>
+    <div id="quiz-container">
+        <p id="question"></p>
+        <div id="options"></div>
+        <p id="score">Score: 0</p>
+        <div id="result" class="hidden">
+            <p id="final-score"></p>
+            <button id="review-button">Review Mistakes</button>
+        </div>
+        <div id="review" class="hidden">
+            <h2>Mistakes:</h2>
+            <ul id="mistakes-list"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Google Sheets API configuration
+    const apiKey = 'AIzaSyBVU8ZySLCKEQ_YRTtrpvQz5yqrtwFkt_s';
+    const sheetId = '1G_baks1_pgSjnmvcHS-wEGi6hrZ7lXyoU0uQkuRW1Sg';
+
+    // Quiz data and state variables
+    let wordData = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let mistakes = [];
+
+    // Fetch data from Google Sheets
+    const fetchData = (range) => {
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+            .then(response => response.json())
+            .then(responseData => {
+                const [header, ...rows] = responseData.values;
+                wordData = rows.map(row => {
+                    const [english, Part_of_Speech, Chinese, Sentence] = row;
+                    return { english, Part_of_Speech, Chinese, Sentence };
+                });
+                startQuiz();
+            })
+            .catch(error => console.error('Error:', error));
+    };
+
+    // Start the quiz
+    const startQuiz = () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        mistakes = [];
+        document.getElementById('score').innerText = `Score: ${score}`;
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('review').classList.add('hidden');
+        document.getElementById('question').classList.remove('hidden');
+        document.getElementById('options').classList.remove('hidden');
+        showQuestion();
+    };
+
+    // Show the current question and options
+    const showQuestion = () => {
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        optionsElement.innerHTML = '';
+
+        if (currentQuestionIndex < wordData.length) {
+            const currentWord = wordData[currentQuestionIndex];
+            questionElement.innerText = `單字：${currentWord.english}, ${currentWord.Part_of_Speech}\n句子：${currentWord.Sentence}`;
+
+            const options = [currentWord.Chinese];
+            while (options.length < 4) {
+                const randomIndex = Math.floor(Math.random() * word

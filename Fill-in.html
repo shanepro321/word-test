@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Fill-in</title>
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div id="navigation">
+  <button id="menu-toggle">Menu</button>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="EPC.html">Quiz EPC</a></li>
+    <li><a href="CPE.html">Quiz CPE</a></li>
+    <li><a href="Fill-in.html">Word Fill-in</a></li>
+    <li><a href="setting.html">Settings</a></li>
+    <li><a href="card.html">Word Card</a></li>
+  </ul>
+</div>
+
+<div class="selection">
+  <label for="lesson-select">選擇課程:</label>
+  <select id="lesson-select">
+    <option value="Lesson7">Lesson 7</option>
+    <option value="Lesson8">Lesson 8</option>
+    <option value="Lesson9">Lesson 9</option>
+  </select>
+  <button id="start-quiz">Start Quiz</button>
+</div>
+
+<div class="container">
+  <h1>Word Fill-in</h1>
+  <div id="word-fill-container" class="word-fill-container"></div>
+  <button id="next-question" class="hidden">Next Question</button>
+  <div id="result" class="hidden">
+    <p id="score"></p>
+    <ul id="mistakes-list"></ul>
+  </div>
+</div>
+
+
+<script>
+  const apiKey = 'AIzaSyBVU8ZySLCKEQ_YRTtrpvQz5yqrtwFkt_s';
+  const sheetId = '1G_baks1_pgSjnmvcHS-wEGi6hrZ7lXyoU0uQkuRW1Sg';
+  let wordData = [];
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let mistakes = [];
+
+  const fetchData = (range) => {
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+            .then(response => response.json())
+            .then(responseData => {
+              const [header, ...rows] = responseData.values;
+              wordData = rows.map(row => {
+                const [english, Part_of_Speech, Chinese, Sentence] = row;
+                return { english, Part_of_Speech, Chinese, Sentence };
+              });
+              showQuestion();
+            })
+            .catch(error => console.error('Error:', error));
+  };
+
+  const showQuestion = () => {
+    const container = document.getElementById('word-fill-container');
+    container.innerHTML = '';
+
+    if (currentQuestionIndex < wordData.length) {
+      const currentWord = wordData[currentQuestionIndex];
+      const prefix = currentWord.english.charAt(0);
+      const suffix = currentWord.english.charAt(currentWord.english.length - 1);
+      const middle = currentWord.english.slice(1, -1);
+
+      container.innerHTML = `
+      <div class="word-fill">
+        <span>${currentWord.Chinese}</span>:
+        <span>${prefix}</span>
+        <input type="text" id="answer-input" data-answer="${middle}" maxlength="${middle.length}">
+        <span>${suffix}</span>
+      </div>
+    `;
+
+      document.getElementById('next-question').classList.remove('hidden');
+    } else {
+      endQuiz();
+    }
+  };
+
+  const checkAnswer = () => {
+    const input = document.getElementById('answer-input');
+    const correctAnswer = input.getAttribute('data-answer');
+    const userAnswer = input.value;
+    const feedbackContainer = document.createElement('div');
+    feedbackContainer.classList.add('feedback');
+
+    if (userAnswer === correctAnswer) {
+      score++;
+      feedbackContainer.innerText = 'O';
+      feedbackContainer.classList.add('correct');
+    } else {
+      const currentWord = wordData[currentQuestionIndex];
+      mistakes.push({
+        chinese: currentWord.Chinese,
+        correctAnswer: currentWord.english,
+        userAnswer: `${currentWord.english.charAt(0)}${userAnswer}${currentWord.english.charAt(currentWord.english.length - 1)}`
+      });
+      feedbackContainer.innerText = 'X';
+      feedbackContainer.classList.add('incorrect');
+    }
+
+    document.getElementById('next-question').classList.add('hidden');
+    const container = document.getElementById('word-fill-container');
+    container.appendChild(feedbackContainer);
+
+    setTimeout(() => {
+      feedbackContainer.remove();
+      currentQuestionIndex++;
+      showQuestion();
+    }, 500);
+  };
+
+  const endQuiz = () => {
+    document.getElementById('word-fill-container').innerHTML = '';
+    document.getElementById('next-question').classList.add('hidden');
+    document.getElementById('score').innerText = `Final Score: ${score} out of ${wordData.length}`;
+    showMistakes();
+  };
+
+  const showMistakes = () => {
+    const mistakesList = document.getElementById('mistakes-list');
+    mistakesList.innerHTML = '';
+
+    mistakes.forEach(mistake => {
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `${mistake.chinese}: Correct Answer: ${mistake.correctAnswer}, Your Answer: ${mistake.userAnswer}`;
+      mistakesList.appendChild(listItem);
+    });
+
+    document.getElementById('result').classList.remove('hidden');
+  };
+
+  document.getElementById('next-question').addEventListener('click', checkAnswer);
+
+  document.getElementById('start-quiz').addEventListener('click', () => {
+    const lessonSelect = document.getElementById('lesson-select');
+    const selectedLesson = lessonSelect.value;
+    currentQuestionIndex = 0;
+    score = 0;
+    mistakes = [];
+    fetchData(selectedLesson);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lessonSelect = document.getElementById('lesson-select');
+    const selectedLesson = lessonSelect ? lessonSelect.value : 'Lesson7'; // Default to Lesson 7
+    fetchData(selectedLesson);
+  });
+
+
+</script>
+</body>
+</html>

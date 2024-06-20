@@ -90,10 +90,19 @@
             const currentWord = wordData[currentQuestionIndex];
             questionElement.innerText = `單字：${currentWord.Chinese}\n 可能有重複項目 請見諒！\nThere may be duplicate items. Please forgive!`;
 
+            // 从 wordData 中提取所有不同的英文单词
+            const uniqueWords = Array.from(new Set(wordData.map(item => item.english)));
+
+            // 确保有足够的不同单词用于生成选项
+            if (uniqueWords.length < 4) {
+                console.error('Not enough unique options to display.');
+                return; // 如果不足4个不同的单词，则不继续执行
+            }
+
             const options = [currentWord.english];
             while (options.length < 4) {
-                const randomIndex = Math.floor(Math.random() * wordData.length);
-                const randomWord = wordData[randomIndex].english;
+                const randomIndex = Math.floor(Math.random() * uniqueWords.length);
+                const randomWord = uniqueWords[randomIndex];
                 if (!options.includes(randomWord)) {
                     options.push(randomWord);
                 }
